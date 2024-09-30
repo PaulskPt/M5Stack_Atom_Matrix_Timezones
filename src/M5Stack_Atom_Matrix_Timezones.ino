@@ -9,10 +9,6 @@
 * I2C device found at address 0x51 !  = RTC unit
 * I2C device found at address 0x68 !  = 6-axis IMU sensor (MPU6886) (builtin the ATOM Matrix)
 *
-* To overcome some difficulties I probably have to change the board type to: "board_M5StickC"
-*
-* ToDo:
-* 2024-09-27: The timeinfo print output says "...zone DST +0100". It should be: "...zone WEST +0100"
 */
 #include <WiFi.h>
 #include <TimeLib.h>
