@@ -14,7 +14,7 @@ A M5Stack Atom Matrix, on top of a M5Stack AtomPortABC base. To the Port A of th
 2. M5Stack OLED (SH1107);
 3. M5Stack RTC (HYM8563);
 
-By Pressing the button on top of the LED display (pressing the screen down), the next Timezone in the map ```time_zones``` will be used and the color of the 5x5 LEDs of the Atom Matrix display will change.
+By Pressing the button on top of the LED display (pressing the screen down), the next Timezone in the map ```zones_map``` will be used and the color of the 5x5 LEDs of the Atom Matrix display will change.
 If the button is not pressed, the sketch will animate the LED display of the Atom Matrix, as if it was a countdown indicator.
 At the moment all LEDs are dimmed (off: BLACK), the sketch will switch to the next Timezone and will set the external RTC unit acordingly.
 In four steps the OLED will show: 
@@ -38,7 +38,7 @@ Update the file secret.h as far as needed:
  d) your timezone code in SECRET_NTP_TIMEZONE_CODE, for example: WET0WEST,M3.5.0/1,M10.5.0;
  e) the name of the NTP server of your choice in SECRET_NTP_SERVER_1, for example: 2.pt.pool.ntp.org.
 ```
- In the sketch is pre-programmed a map (dictionary), name ```time_zones```. This map contains six timezones:
+ In the sketch is pre-programmed a map (dictionary), name ```zones_map```. This map contains six timezones:
 
 ```
     zones_map[0] = std::make_tuple("Asia/Tokyo", "JST-9");
@@ -50,7 +50,7 @@ Update the file secret.h as far as needed:
 ```
 
  After reset the sketch will load from the file ```secret.h``` the values of ```SECRET_NTP_TIMEZONE``` and ```SECRET_NTP_TIMEZONE_CODE```, 
- and replaces the first record in the map time_zones with these values from secret.h.
+ and replaces the first record in the map ```zones_map``` with these values from secret.h.
 
 Docs:
 
