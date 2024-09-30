@@ -23,7 +23,7 @@ In four steps the OLED will show:
    3) date info, for example "Monday September 30 2024"; 
    4) time info, for example: "20:52:28 in: Lisbon".
 
-On reset the Arduino Sketch will try to connect to the WiFi Access Point of your choice (set in secret.h). If successful the sketch will next connect to a NTP server and download the current datetime stamp.
+On reset the Arduino Sketch will try to connect to the WiFi Access Point of your choice (set in secret.h). If successful the sketch will next connect to a NTP server of your choice, then download the current datetime stamp.
 If NTP is connected, the external RTC unit will be set to the NTP datetime stamp with the local time for the current Timezone.
 Next the sketch will display date and time of the current Timezone, taken from the external RTC, onto the OLED display. Every second the date and time will be updated.
 Because the external RTC Unit has a built-in battery, the datetime set will not be lost when power is lost.
