@@ -51,8 +51,8 @@ Timezone code has changed to: "JST-9"
 setTimezone(): check environment variable TZ = "JST-9"
 
 WiFi:................
-connect_WiFi(): WiFi Connected to: Vodafone-8D96F1
-IP address: 192.168.1.188
+connect_WiFi(): WiFi Connected to: ____________
+IP address: 192.168._.___
 MAC: A0:AC:81:8:B7:64
 initTime(): Setting up time
 zone       = "Asia/Tokyo"
