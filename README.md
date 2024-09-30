@@ -5,7 +5,7 @@ Important credit:
 I was only able to create and successfully finish this project with the great help of Microsoft AI assistant CoPilot.
 CoPilot helped me correcting wrong C++ code fragments. It suggested C++ code fragments. CoPilot gave me, in one Q&A session, a "workaround" 
 for certain limitation that the Arduino IDE has with the standard C++ specification. And CoPilot gave it's answers at great speed of response.
-There were no delays. The answers were instantaneuous! Thank you CoPilot. Thank you Microsoft for this exciting new tool!
+There were no delays. The answers were instantaneous! Thank you CoPilot. Thank you Microsoft for this exciting new tool!
 
 Hardware setup:
 
