@@ -46,7 +46,7 @@ See the Monitor_output.txt
 
 Images 
 
-Image(s) and a short [video](https://imgur.com/a/ImBcJGW).
+Image(s).
 
 Hardware used:
 - M5Stack Atom Matrix ESP32 Development Kit [info](https://shop.m5stack.com/products/atom-matrix-esp32-development-kit);
