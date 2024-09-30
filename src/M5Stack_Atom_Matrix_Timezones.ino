@@ -29,18 +29,11 @@
 #include <tuple>
 #include <cstring> // For strcpy
 
-namespace {
-
-#define SCL 21
-#define SDA 25
-#define I2C_FREQ 400000
-#define I2C_PORT 0
-#define I2C_ADDR_OLED 0x3c
-#define I2C_ADDR_RTC  0x51
+namespace {  // anonymous namespace (also known as an unnamed namespace)
 
 // LEDs display
 #define NUM_LEDS 25
-#define DATA_PIN 27
+//#define DATA_PIN 27
 CRGB leds[NUM_LEDS];
 
 #define WIFI_SSID     SECRET_SSID // "YOUR WIFI SSID NAME"
@@ -52,42 +45,33 @@ CRGB leds[NUM_LEDS];
 #define NTP_SERVER3   "2.pool.ntp.org"
 
 bool lStart = true;
+bool use_local_time = false; // for the external RTC    (was: use_local_time = true // for the ESP32 internal clock )
 struct tm timeinfo;
+bool use_timeinfo = true;
 
-// Atom Matrix display = w x h: 128 x 64 pixels
+// 128 x 64
 static constexpr const int vert[] = {0, 30, 60};
 
 unsigned long start_t = millis();
 
+bool ledDisplayHorizontal = true;
 bool LedTimeToChangeColor = false;
 int LedCountDownCounter = NUM_LEDS;
 int LedNrDone = 0;
 
-int FSM = 0;  // Store the number of key presses
+
+uint8_t FSM = 0;  // Store the number of key presses
 int connect_try = 0;
 int max_connect_try = 10;
 
-// Different versions of the framework have different SNTP header file names and availability.
-#if __has_include (<esp_sntp.h>)
-  #include <esp_sntp.h>
-  #define SNTP_ENABLED 1
-#elif __has_include (<sntp.h>)
-  #include <sntp.h>
-  #define SNTP_ENABLED 1
-#endif
-
-#ifndef SNTP_ENABLED
-#define SNTP_ENABLED 0
-#endif
-
-Unit_RTC RTC(I2C_ADDR_RTC);
+Unit_RTC RTC(0x51);
 
 rtc_time_type RTCtime;
 rtc_date_type RTCdate;
 
 volatile bool buttonPressed = false;
 
-M5UnitOLED display(SDA, SCL, I2C_FREQ, I2C_PORT, I2C_ADDR_OLED);
+M5UnitOLED display(25, 21, 400000, 0, 0x3c);
 
 M5Canvas canvas(&display);
 
@@ -157,14 +141,14 @@ void LedFillColor(CRGB c)
   FastLED.show();
 }
 
-int LedHorizMatrixIdArray[25] = 
+int LedMatrix[25] = 
 {
   20, 15, 10, 5, 0,
   21, 16, 11, 6, 1,
   22, 17, 12, 7, 2,
   23, 18, 13, 8, 3,
   24, 19, 14, 9, 4
-  };
+};
 
 void LedSetBlack()
 {
@@ -182,7 +166,7 @@ void LedDownCounter()
 
 void LedHorizDownCounter()
 {
-  int idx = LedHorizMatrixIdArray[LedNrDone];
+  int idx = LedMatrix[LedNrDone];
   leds[idx] = CRGB::Black;   // range 0-24
   FastLED.show();
   LedNrDone++;
@@ -349,8 +333,8 @@ void printLocalTime()  // "Local" of the current selected timezone!
 
 void prLedNrDone()
 {
-  Serial.printf("LedNrDone = %02d, LedHorizMatrixIdArray[%d] = %02d, LedTimeToChangeColor = %02d\n", 
-    LedNrDone, LedNrDone, LedHorizMatrixIdArray[LedNrDone], LedTimeToChangeColor);
+  Serial.printf("LedNrDone = %02d, LedMatrix[%d] = %02d, LedTimeToChangeColor = %02d\n", 
+    LedNrDone, LedNrDone, LedMatrix[LedNrDone], LedTimeToChangeColor);
 }
 
 /* This function uses global var timeinfo to display date and time data.
@@ -360,7 +344,6 @@ void prLedNrDone()
 void disp_data(void)
 {
   char TAG[] = "disp_data(): ";
-  bool ledDisplayHorizontal = true;
   int disp_data_delay = 1000;
   // For unitOLED
   int scrollstep = 2;
@@ -632,7 +615,9 @@ void setup(void)
 
   attachInterrupt(digitalPinToInterrupt(ck_Btn()), handleButtonPress, FALLING);
 
-  FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, NUM_LEDS);
+  // FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812, 27, GRB>(leds, NUM_LEDS);
+  
   FastLED.setBrightness(20);
   FastLED.clear();
   FastLED.show();
