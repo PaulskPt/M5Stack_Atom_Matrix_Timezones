@@ -52,23 +52,18 @@ CRGB leds[NUM_LEDS];
 #define NTP_SERVER3   "2.pool.ntp.org"
 
 bool lStart = true;
-bool use_local_time = false; // for the external RTC    (was: use_local_time = true // for the ESP32 internal clock )
 struct tm timeinfo;
-bool use_timeinfo = true;
 
-// 128 x 64
-static constexpr const int hori[] = {0, 30, 50};
-static constexpr const int vert[] = {0, 30, 60, 90, 120};
+// Atom Matrix display = w x h: 128 x 64 pixels
+static constexpr const int vert[] = {0, 30, 60};
 
 unsigned long start_t = millis();
 
-bool ledDisplayHorizontal = true;
 bool LedTimeToChangeColor = false;
 int LedCountDownCounter = NUM_LEDS;
-int LedCountDownDelay = 100;
 int LedNrDone = 0;
 
-uint8_t FSM = 0;  // Store the number of key presses
+int FSM = 0;  // Store the number of key presses
 int connect_try = 0;
 int max_connect_try = 10;
 
@@ -90,22 +85,11 @@ Unit_RTC RTC(I2C_ADDR_RTC);
 rtc_time_type RTCtime;
 rtc_date_type RTCdate;
 
-// Atom Matrix (ESP32-PICO) with a 5 * 5 RGB LED matrix panel (WS2812C-2020)
-#define NEOPIXEL_LED_PIN 27
-#define IR_PIN 12
-
 volatile bool buttonPressed = false;
 
 M5UnitOLED display(SDA, SCL, I2C_FREQ, I2C_PORT, I2C_ADDR_OLED);
 
-int dw = display.width();
-int dh = display.height();
-int disp_data_delay = 1000;
-
 M5Canvas canvas(&display);
-
-const char* boardName;
-static constexpr const char* wd[7] = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
 
 int zone_idx = 0;
 const int zone_max_idx = 6;
@@ -185,7 +169,6 @@ int LedHorizMatrixIdArray[25] =
 void LedSetBlack()
 {
   leds[LedCountDownCounter] = CRGB::Black; // Change color as needed
-  //delay(LedCountDownDelay); // Adjust delay for speed of animation
   FastLED.show();
 }
 
@@ -249,7 +232,7 @@ bool poll_NTP()
     Serial.print(TAG);
     Serial.println(F("Failed to obtain time "));
     canvas.clear();
-    canvas.setCursor(hori[0], vert[2]);
+    canvas.setCursor(0, vert[2]);
     canvas.print(F("Failed to obtain time"));
     display.waitDisplay();
     canvas.pushSprite(&display, 0, (display.height() - canvas.height()) >> 1);
@@ -377,6 +360,8 @@ void prLedNrDone()
 void disp_data(void)
 {
   char TAG[] = "disp_data(): ";
+  bool ledDisplayHorizontal = true;
+  int disp_data_delay = 1000;
   // For unitOLED
   int scrollstep = 2;
 
@@ -421,25 +406,25 @@ void disp_data(void)
   // prLedNrDone();
   if (index >= 0 && index2 >= 0)
   {
-    canvas.setCursor(hori[0], vert[0]+5);
+    canvas.setCursor(0, vert[0]+5);
     canvas.scroll(-scrollstep, 0);
     canvas.print(part1.c_str());
-    canvas.setCursor(hori[0], vert[1]-2);
+    canvas.setCursor(0, vert[1]-2);
     canvas.print(part3.c_str());
-    canvas.setCursor(hori[0], vert[2]-10);
+    canvas.setCursor(0, vert[2]-10);
     canvas.print(part4.c_str());
   }
   else if (index >= 0)
   {
-    canvas.setCursor(hori[0], vert[0]+5);
+    canvas.setCursor(0, vert[0]+5);
     canvas.scroll(-scrollstep, 0);
     canvas.print(part1.c_str());
-    canvas.setCursor(hori[0], vert[1]);
+    canvas.setCursor(0, vert[1]);
     canvas.print(part2.c_str());
   }
   else
   {
-    canvas.setCursor(hori[0], vert[0]+5);
+    canvas.setCursor(0, vert[0]+5);
     canvas.print(copiedString.c_str());
   }
   display.waitDisplay();
@@ -456,9 +441,9 @@ void disp_data(void)
     return;
   // prLedNrDone();
   canvas.clear();
-  canvas.setCursor(hori[0], vert[0]+5);
+  canvas.setCursor(0, vert[0]+5);
   canvas.print("Zone");
-  canvas.setCursor(hori[0], vert[1]);
+  canvas.setCursor(0, vert[1]);
   canvas.print(&timeinfo, "%Z %z");
   display.waitDisplay();
   canvas.pushSprite(&display, 0, (display.height() - canvas.height()) >> 1);
@@ -474,11 +459,11 @@ void disp_data(void)
     return;
   // prLedNrDone();
   canvas.clear();
-  canvas.setCursor(hori[0], vert[0]+5);
+  canvas.setCursor(0, vert[0]+5);
   canvas.print(&timeinfo, "%A");  // Day of the week
-  canvas.setCursor(hori[0], vert[1]-2);
+  canvas.setCursor(0, vert[1]-2);
   canvas.print(&timeinfo, "%B %d");
-  canvas.setCursor(hori[0], vert[2]-10);
+  canvas.setCursor(0, vert[2]-10);
   canvas.print(&timeinfo, "%Y");
   display.waitDisplay();
   canvas.pushSprite(&display, 0, (display.height() - canvas.height()) >> 1);
@@ -494,9 +479,9 @@ void disp_data(void)
     return;
   // prLedNrDone();
   canvas.clear();
-  canvas.setCursor(hori[0], vert[0]+5);
+  canvas.setCursor(0, vert[0]+5);
   canvas.print(&timeinfo, "%H:%M:%S");
-  canvas.setCursor(hori[0], vert[1]);
+  canvas.setCursor(0, vert[1]);
   if (index2 >= 0)
   {
     canvas.printf("in: %s\n", part4.c_str());
