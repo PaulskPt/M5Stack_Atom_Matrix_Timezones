@@ -18,9 +18,9 @@ By Pressing the button on top of the LED display (pressing the screen down), the
 If the button is not pressed, the sketch will animate the LED display of the Atom Matrix, as if it was a countdown indicator.
 At the moment all LEDs are dimmed (off: BLACK), the sketch will switch to the next Timezone and will set the external RTC unit acordingly.
 In four steps the OLED will show: 
-   1) Time zone name and city, for example: "Europe" and "Lisbon"; 
+   1) Time zone continent and city, for example: "Europe" and "Lisbon"; 
    2) the word "Zone" and the Timezone in letters, for example "CEST", and the offset to UTC, for example "+0100";
-   3) date info, for example "Monday September 30"; 
+   3) date info, for example "Monday September 30 2024"; 
    4) time info, for example: "20:52:28 in: Lisbon".
 
 On reset the Arduino Sketch will try to connect to the WiFi Access Point of your choice (set in secret.h). If successful the sketch will next connect to a NTP server and download the current datetime stamp.
