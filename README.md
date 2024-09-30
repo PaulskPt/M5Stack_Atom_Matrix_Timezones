@@ -1,6 +1,15 @@
 M5Stack Atom Matrix Timezones
 
-To the Port A of the AtomPortABC module are connected:
+Important credit:
+
+I was only able to create and successfully finish this project with the great help of Microsoft AI assistant CoPilot.
+CoPilot helped me correcting wrong C++ code fragments. It suggested C++ code fragments. CoPilot gave me, in one Q&A session, a "workaround" 
+for certain limitation that the Arduino IDE has with the standard C++ specification. And CoPilot gave it's answers at great speed of response.
+There were no delays. The answers were instantaneuous! Thank you CoPilot. Thank you Microsoft for this exciting new tool!
+
+Hardware setup:
+
+A M5Stack Atom Matrix, on top of a M5Stack AtomPortABC base. To the Port A of the AtomPortABC base are connected:
 1. M5Stack GROVE HUB;
 2. M5Stack OLED (SH1107);
 3. M5Stack RTC (HYM8563);
@@ -14,12 +23,12 @@ In four steps the OLED will show:
    3) date info, for example "Monday September 30"; 
    4) time info, for example: "20:52:28 in: Lisbon".
 
-On reset the Arduino Sketch will try to connect to a WiFi Access Point. If successful the sketch will next connect to a NTP server and download the current datetime stamp.
+On reset the Arduino Sketch will try to connect to the WiFi Access Point of your choice (set in secret.h). If successful the sketch will next connect to a NTP server and download the current datetime stamp.
 If NTP is connected, the external RTC unit will be set to the NTP datetime stamp.
 Next the sketch will display date and time (UTC), taken from the external RTC, onto the OLED display. Every second the date and time will be updated.
 Because the external RTC Unit has a built-in battery, the datetime set will not be lost when power is lost.
 
-File secret.h :
+File secret.h:
 
 Update the file secret.h as far as needed:
 ```
@@ -43,15 +52,20 @@ Update the file secret.h as far as needed:
  After reset the sketch will load from the file ```secret.h``` the values of ```SECRET_NTP_TIMEZONE``` and ```SECRET_NTP_TIMEZONE_CODE```, 
  and replaces the first record in the map time_zones with these values from secret.h.
 
-Docs
+Docs:
 
 See the Monitor_output.txt
 
-Images 
+Images: 
 
-Hardware used:
+See a snapshot image taken from a video I creeated of the sketch running. I uploaded this video to Irmgur,
+however, until this moment, I wasn't able to create a correct link to put in this README.
+
+Links to product pages of the hardware used:
+
 - M5Stack Atom Matrix ESP32 Development Kit [info](https://shop.m5stack.com/products/atom-matrix-esp32-development-kit);
 - M5Stack AtomPortABC base [info](https://docs.m5stack.com/en/unit/AtomPortABC);
 - M5Stack GROVE HUB [info](https://docs.m5stack.com/en/unit/hub);
 - M5Stack OLED unit [info](https://docs.m5stack.com/en/unit/oled);
 - M5Stack RTC unit [info](https://shop.m5stack.com/products/real-time-clock-rtc-unit-hym8563)
+
