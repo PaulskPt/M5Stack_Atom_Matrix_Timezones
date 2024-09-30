@@ -14,7 +14,7 @@ A M5Stack Atom Matrix, on top of a M5Stack AtomPortABC base. To the Port A of th
 2. M5Stack OLED (SH1107);
 3. M5Stack RTC (HYM8563);
 
-By Pressing the button on top of the LED display (pressing the screen down), the color of the 5x5 LEDs will change.
+By Pressing the button on top of the LED display (pressing the screen down), the color of the 5x5 LEDs of the Atom Matrix display will change.
 If the button is not pressed, the sketch will animate the LED display of the Atom Matrix, as if it was a countdown indicator.
 At the moment all LEDs are dimmed (off: BLACK), the sketch will switch to the next Timezone and will set the external RTC unit acordingly.
 In four steps the OLED will show: 
@@ -24,8 +24,8 @@ In four steps the OLED will show:
    4) time info, for example: "20:52:28 in: Lisbon".
 
 On reset the Arduino Sketch will try to connect to the WiFi Access Point of your choice (set in secret.h). If successful the sketch will next connect to a NTP server and download the current datetime stamp.
-If NTP is connected, the external RTC unit will be set to the NTP datetime stamp.
-Next the sketch will display date and time (UTC), taken from the external RTC, onto the OLED display. Every second the date and time will be updated.
+If NTP is connected, the external RTC unit will be set to the NTP datetime stamp with the local time for the current Timezone.
+Next the sketch will display date and time of the current Timezone, taken from the external RTC, onto the OLED display. Every second the date and time will be updated.
 Because the external RTC Unit has a built-in battery, the datetime set will not be lost when power is lost.
 
 File secret.h:
