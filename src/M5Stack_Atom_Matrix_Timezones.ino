@@ -167,26 +167,18 @@ void map_replace_first_zone()
   std::string elem_zone_check;
   std::string elem_zone_code_check;
   
-  //index = elem_zone.find(NTP_TIMEZONE);
-
   elem_zone_original = elem_zone; // make a copy
   elem_zone_code_original = elem_zone_code;
-
-  //if (NTP_TIMEZONE != NULL && NTP_TIMEZONE_CODE != NULL)
-  //{
-    elem_zone = NTP_TIMEZONE;
-    elem_zone_code = NTP_TIMEZONE_CODE;
-    zones_map[0] = std::make_tuple(elem_zone, elem_zone_code);
-    // Check:
-    elem_zone_check  = std::get<0>(zones_map[tmp_zone_idx]);
-    elem_zone_code_check  = std::get<1>(zones_map[tmp_zone_idx]);
-    //if (elem_zone_original == elem_zone_check && elem_zone_code_original == elem_zone_code_check)
-    //{
-      Serial.print(F("map_replace_first_zone(): successful replaced the first record of the zone_map:\n"));
-      Serial.printf("zone original: \"%s\", replaced by zone: \"%s\" (from file secrets.h)\n", elem_zone_original.c_str(), elem_zone_code_check.c_str());
-      Serial.printf("zone code original: \"%s\", replaced by zone code: \"%s\"\n", elem_zone_code_original.c_str(), elem_zone_code_check.c_str());
-    //}
-  //}
+  elem_zone = NTP_TIMEZONE;
+  elem_zone_code = NTP_TIMEZONE_CODE;
+  zones_map[0] = std::make_tuple(elem_zone, elem_zone_code);
+  // Check:
+  elem_zone_check  = std::get<0>(zones_map[tmp_zone_idx]);
+  elem_zone_code_check  = std::get<1>(zones_map[tmp_zone_idx]);
+  
+  Serial.print(F("map_replace_first_zone(): successful replaced the first record of the zone_map:\n"));
+  Serial.printf("zone original: \"%s\", replaced by zone: \"%s\" (from file secrets.h)\n", elem_zone_original.c_str(), elem_zone_code_check.c_str());
+  Serial.printf("zone code original: \"%s\", replaced by zone code: \"%s\"\n", elem_zone_code_original.c_str(), elem_zone_code_check.c_str());
 }
 
 void LedFillColor(CRGB c)
