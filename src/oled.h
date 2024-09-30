@@ -1,0 +1,14 @@
+//from m5stack import *
+//from m5ui import *
+//from uiflow import *
+//import time
+//import unit
+
+#include <m5ui.h>
+#include <unit.h>
+
+rgb.set_screen([0x111112,0x111112,0x111112,0x111112,0x111112,0xf20d70,0xf20d70,0xf20d70,0xf20d70,0xf20d70,0xf9f9fb,0xf9f9fb,0xf9f9fb,0xf9f9fb,0xf9f9fb,0x1111e8,0x1111e8,0x1111e8,0x1111e8,0x1111e8,0x111112,0,0,0,0x111112])
+oled_0 = unit.get(unit.OLED, unit.PORTA)
+
+oled_0.poweron()
+while True:

@@ -1,0 +1,139 @@
+Monday 2024-09-30 00h43 utc+1
+
+Platform: M5 Atom Matrix on top of a M5Stack AtomPortABC
+and following I2C devices, via a M5Stack GROVE HUB, connected to AtomPortABC, port A:
+1) M5Stack GROVE HUB;
+2) M5Stack OLED unit;
+3) M5Stack RTC unit.
+
+IDE: Arduino IDE v2.3.3
+
+Sketch: M5Stack_Atom_Matrix_with_OLED_and_RTC_units_v2.ino
+Sketch file datetime: 2025-09-30 00h41
+Sketch filelength: 23KB
+
+NOTES:
+- Added function: map_replace_first_zone().
+  This function takes the NTP_TIMEZONE and NTP_TIMEZONE_CODE (from secret.h)
+  In the current case: 
+  #define SECRET_NTP_TIMEZONE "Asia/Tokyo" // instead of (originally): "Europe/Lisbon"
+  #define SECRET_NTP_TIMEZONE_CODE "JST-9" // instead of (originally); "WET0WEST,M3.5.0/1,M10.5.0"
+  and replaces this in the map: time_zone via a call to map_replace_first_zone() in function setup()
+  Here is the code fragement in setup():
+    map_replace_first_zone();
+    // NTP auto setting
+    std::string elem_zone_code  = std::get<1>(zones_map[0]);
+    configTzTime(elem_zone_code.c_str(), NTP_SERVER1, NTP_SERVER2, NTP_SERVER3);
+    setTimezone();
+	
+  And after this replacement the sketch will nicely use as the first Timezone: "Asia/Tokyo" with timezone code: "JST-9".
+
+
+Monitor output:
+
+ets Jun  8 2016 00:22:57
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 188777542, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:1
+load:0x3fff0030,len:1344
+load:0x40078000,len:13964
+load:0x40080400,len:3600
+entry 0x400805f0
+M5Atom initializing...OK
+
+ESP32 Chip ID = A0AC8108B764
+chipid mirrored (same as M5Burner MAC): 64:B7:08:81:AC:A0
+
+M5Stack Atom Matrix Timezones test with units: RTC and OLED.
+setTimezone(): Timezone has changed to: "Asia/Tokyo"
+Timezone code has changed to: "JST-9"
+setTimezone(): check environment variable TZ = "JST-9"
+
+WiFi:................
+connect_WiFi(): WiFi Connected to: Vodafone-8D96F1
+IP address: 192.168.1.188
+MAC: A0:AC:81:8:B7:64
+initTime(): Setting up time
+zone       = "Asia/Tokyo"
+zone_code  = "JST-9"
+NTP_SERVER1: 2.pt.pool.ntp.org, NTP_SERVER2: 1.pool.ntp.org, NTP_SERVER3: 2.pool.ntp.org
+setTimezone(): Timezone has changed to: "Asia/Tokyo"
+Timezone code has changed to: "JST-9"
+setTimezone(): check environment variable TZ = "JST-9"
+initTime(): Got the time from NTP
+set_RTC(): external RTC has been set
+Check: 
+RTC date: 2024-09-30
+RTC time: 08:43:12
+Timezone: Asia/Tokyo, Monday, September 30 2024 08:43:12 zone JST +0900
+initTime(): Setting up time
+zone       = "Asia/Tokyo"
+zone_code  = "JST-9"
+NTP_SERVER1: 2.pt.pool.ntp.org, NTP_SERVER2: 1.pool.ntp.org, NTP_SERVER3: 2.pool.ntp.org
+setTimezone(): Timezone has changed to: "Asia/Tokyo"
+Timezone code has changed to: "JST-9"
+setTimezone(): check environment variable TZ = "JST-9"
+initTime(): Got the time from NTP
+set_RTC(): external RTC has been set
+Check: 
+RTC date: 2024-09-30
+RTC time: 08:43:16
+Timezone: Asia/Tokyo, Monday, September 30 2024 08:43:16 zone JST +0900
+Timezone: Asia/Tokyo, Monday, September 30 2024 08:43:16 zone JST +0900
+Timezone: Asia/Tokyo, Monday, September 30 2024 08:43:16 zone JST +0900
+Timezone: Asia/Tokyo, Monday, September 30 2024 08:43:16 zone JST +0900
+Timezone: Asia/Tokyo, Monday, September 30 2024 08:43:16 zone JST +0900
+Timezone: Asia/Tokyo, Monday, September 30 2024 08:43:16 zone JST +0900
+initTime(): Setting up time
+zone       = "America/Kentucky/Louisville"
+zone_code  = "EST5EDT,M3.2.0,M11.1.0"
+NTP_SERVER1: 2.pt.pool.ntp.org, NTP_SERVER2: 1.pool.ntp.org, NTP_SERVER3: 2.pool.ntp.org
+setTimezone(): Timezone has changed to: "America/Kentucky/Louisville"
+Timezone code has changed to: "EST5EDT,M3.2.0,M11.1.0"
+setTimezone(): check environment variable TZ = "EST5EDT,M3.2.0,M11.1.0"
+initTime(): Got the time from NTP
+Timezone: America/Kentucky/Louisville, Sunday, September 29 2024 19:43:39 zone EDT -0400
+disp_data(): part4 = Louisville, index2 = 8
+initTime(): Setting up time
+zone       = "America/Kentucky/Louisville"
+zone_code  = "EST5EDT,M3.2.0,M11.1.0"
+NTP_SERVER1: 2.pt.pool.ntp.org, NTP_SERVER2: 1.pool.ntp.org, NTP_SERVER3: 2.pool.ntp.org
+setTimezone(): Timezone has changed to: "America/Kentucky/Louisville"
+Timezone code has changed to: "EST5EDT,M3.2.0,M11.1.0"
+setTimezone(): check environment variable TZ = "EST5EDT,M3.2.0,M11.1.0"
+initTime(): Got the time from NTP
+set_RTC(): external RTC has been set
+Check: 
+RTC date: 2024-09-29
+RTC time: 19:43:43
+Timezone: America/Kentucky/Louisville, Sunday, September 29 2024 19:43:43 zone EDT -0400
+disp_data(): part4 = Louisville, index2 = 8
+Timezone: America/Kentucky/Louisville, Sunday, September 29 2024 19:43:43 zone EDT -0400
+disp_data(): part4 = Louisville, index2 = 8
+Timezone: America/Kentucky/Louisville, Sunday, September 29 2024 19:43:43 zone EDT -0400
+disp_data(): part4 = Louisville, index2 = 8
+Timezone: America/Kentucky/Louisville, Sunday, September 29 2024 19:43:43 zone EDT -0400
+disp_data(): part4 = Louisville, index2 = 8
+Timezone: America/Kentucky/Louisville, Sunday, September 29 2024 19:43:43 zone EDT -0400
+disp_data(): part4 = Louisville, index2 = 8
+Timezone: America/Kentucky/Louisville, Sunday, September 29 2024 19:43:43 zone EDT -0400
+
+[...] and so on...
+
+
+-------------------------------------------
+After a change in function map_replace_first_zone(), the first part of the monitor output is now:
+
+ESP32 Chip ID = A0AC8108B764
+chipid mirrored (same as M5Burner MAC): 64:B7:08:81:AC:A0
+
+M5Stack Atom Matrix Timezones test with units: RTC and OLED.
+map_replace_first_zone(): successful replaced the first record of the zone_map:
+zone original: "Europe/Lisbon", replaced by zone: "JST-9" (from file secrets.h)
+zone code original: "WET0WEST,M3.5.0/1,M10.5.0", replaced by zone code: "JST-9"
+setTimezone(): Timezone has changed to: "Asia/Tokyo"
+Timezone code has changed to: "JST-9"
+setTimezone(): check environment variable TZ = "JST-9"
+
+---------------------------------------------
