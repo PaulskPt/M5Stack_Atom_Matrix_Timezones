@@ -14,7 +14,7 @@ A M5Stack Atom Matrix, on top of a M5Stack AtomPortABC base. To the Port A of th
 2. M5Stack OLED (SH1107);
 3. M5Stack RTC (HYM8563);
 
-By Pressing the button on top of the LED display (pressing the screen down), the color of the 5x5 LEDs of the Atom Matrix display will change.
+By Pressing the button on top of the LED display (pressing the screen down), the next timezone in the map ```time_zones``` will be used and the color of the 5x5 LEDs of the Atom Matrix display will change.
 If the button is not pressed, the sketch will animate the LED display of the Atom Matrix, as if it was a countdown indicator.
 At the moment all LEDs are dimmed (off: BLACK), the sketch will switch to the next Timezone and will set the external RTC unit acordingly.
 In four steps the OLED will show: 
