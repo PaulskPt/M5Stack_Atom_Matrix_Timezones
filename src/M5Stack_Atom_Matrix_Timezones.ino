@@ -2,7 +2,7 @@
 *  Test sketch for M5Stack 1.3 inch OLED SH1107 display with 128 x 64 pixels
 *  and RTC unit (8563)
 *  by @PaulskPt 2024-09-19
-*  OLED unit and RTC unit via a GROVE HUB connected to PortA of a M5Stack AtomPortABC module with on top a M5Stack Atom Matrix
+*  Units: OLED and RTC connected via a GROVE HUB to PortA of a M5Stack AtomPortABC base with on top a M5Stack Atom Matrix
 *
 * About i2c_scan with following units connected to Atrom PortABC, Port A: RTC unit and OLED unit:
 * I2C device found at address 0x3c !  = OLED unit
@@ -18,18 +18,16 @@
 #include <Unit_RTC.h>  
 #include <M5UnitOLED.h>
 #include <M5GFX.h>
+#include <driver/adc.h>
+#include <FastLED.h>
 #include "secret.h"
-// Following 5 includes needed for creating and using zones_map
+// Following 6 includes needed for creating, changing and using map time_zones
 #include <iostream>
 #include <map>
 #include <array>
 #include <string>
 #include <tuple>
 #include <cstring> // For strcpy
-#include <driver/adc.h>
-#include <FastLED.h>
-
-//using namespace std;
 
 namespace {
 
@@ -49,7 +47,7 @@ CRGB leds[NUM_LEDS];
 #define WIFI_PASSWORD SECRET_PASS //"YOUR WIFI PASSWORD"
 #define NTP_TIMEZONE  SECRET_NTP_TIMEZONE // for example: "Europe/Lisbon"
 #define NTP_TIMEZONE_CODE  SECRET_NTP_TIMEZONE_CODE // for example: "WET0WEST,M3.5.0/1,M10.5.0"
-#define NTP_SERVER1   SECRET_NTP_SERVER_1 // "0.pool.ntp.org"
+#define NTP_SERVER1   SECRET_NTP_SERVER_1 // for example: "0.pool.ntp.org"
 #define NTP_SERVER2   "1.pool.ntp.org"
 #define NTP_SERVER3   "2.pool.ntp.org"
 
@@ -97,13 +95,7 @@ rtc_date_type RTCdate;
 #define IR_PIN 12
 
 volatile bool buttonPressed = false;
-/*
-#define BUTTON_PIN 39
-int buttonState = 0; 
-int lastButtonState = 0; 
-unsigned long lastDebounceTime = 0; 
-unsigned long debounceDelay = 50; // Debounce time in milliseconds
-*/
+
 M5UnitOLED display(SDA, SCL, I2C_FREQ, I2C_PORT, I2C_ADDR_OLED);
 
 int dw = display.width();
@@ -112,23 +104,14 @@ int disp_data_delay = 1000;
 
 M5Canvas canvas(&display);
 
-// For unitOLED
-int textpos    = 0;
-int scrollstep = 2;
-int32_t cursor_x = canvas.getCursorX() - scrollstep;
 const char* boardName;
 static constexpr const char* wd[7] = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
-char text[50];
-size_t textlen = 0;
 
 int zone_idx = 0;
 const int zone_max_idx = 6;
 // I know Strings are less memory efficient than char arrays, 
 // however I have less "headache" by using Strings. E.g. the string.indexOf()
 // and string.substring() functions make work much easier!
-
-// Pre-definition:
-//std::map; // <int, std::array<std::string> >> zones_map;
 
 } // end of namespace
 
@@ -190,7 +173,6 @@ void LedFillColor(CRGB c)
   FastLED.show();
 }
 
-
 int LedHorizMatrixIdArray[25] = 
 {
   20, 15, 10, 5, 0,
@@ -199,7 +181,6 @@ int LedHorizMatrixIdArray[25] =
   23, 18, 13, 8, 3,
   24, 19, 14, 9, 4
   };
-
 
 void LedSetBlack()
 {
@@ -232,9 +213,7 @@ bool zone_has_changed = false;
 void setTimezone(void){
   char TAG[] = "setTimezone(): ";
   Serial.print(TAG);
-  //int element_zone = 0;
   std::string elem_zone = std::get<0>(zones_map[zone_idx]);
-  //int element_zone_code = 1;
   std::string elem_zone_code = std::get<1>(zones_map[zone_idx]);
   if (elem_zone_code != elem_zone_code_old)
   {
@@ -244,13 +223,14 @@ void setTimezone(void){
     Serial.printf("Timezone code %s\"%s\"\n",s1, elem_zone_code.c_str());
   }
   // Serial.printf("Setting Timezone to \"%s\"\n",elem_zone_code.c_str());
-  setenv("TZ",elem_zone_code.c_str(),1);  //  Now adjust the TZ.  Clock settings are adjusted to show the new local time
+  setenv("TZ",elem_zone_code.c_str(),1);
+  //  Now adjust the TZ.  Clock settings are adjusted to show the new local time
   tzset();
   // Check:
   Serial.print(TAG);
   Serial.print(F("check environment variable TZ = \""));
   Serial.printf("%s", getenv("TZ"));
-  Serial.println("\"");
+  Serial.println(F("\""));
 }
 
 /*
@@ -267,10 +247,10 @@ bool poll_NTP()
   else
   {
     Serial.print(TAG);
-    Serial.println("Failed to obtain time ");
+    Serial.println(F("Failed to obtain time "));
     canvas.clear();
     canvas.setCursor(hori[0], vert[2]);
-    canvas.print("Failed to obtain time");
+    canvas.print(F("Failed to obtain time"));
     display.waitDisplay();
     canvas.pushSprite(&display, 0, (display.height() - canvas.height()) >> 1);
     delay(3000);
@@ -289,7 +269,7 @@ bool initTime(void)
   std::string elem_zone_code = std::get<1>(zones_map[zone_idx]);
 
   Serial.print(TAG);
-  Serial.println("Setting up time");
+  Serial.println(F("Setting up time"));
   Serial.printf("zone       = \"%s\"\n", elem_zone.c_str());  
   Serial.printf("zone_code  = \"%s\"\n", elem_zone_code.c_str());  
   Serial.printf("NTP_SERVER1: %S, NTP_SERVER2: %s, NTP_SERVER3: %s\n", NTP_SERVER1, NTP_SERVER2, NTP_SERVER3);
@@ -397,18 +377,10 @@ void prLedNrDone()
 void disp_data(void)
 {
   char TAG[] = "disp_data(): ";
-  canvas.clear();
-  cursor_x = canvas.getCursorX() - scrollstep;
-  if (cursor_x <= 0)
-  {
-    textpos  = 0;
-    cursor_x = display.width();
-  }
+  // For unitOLED
+  int scrollstep = 2;
 
-  /*
-  int element_zone = 0;
-  int element_zone_code = 1;
-  */
+  canvas.clear();
   std::string elem_zone  = std::get<0>(zones_map[zone_idx]);
   std::string copiedString, copiedString2;
   std::string part1, part2, part3, part4;
@@ -484,7 +456,6 @@ void disp_data(void)
     return;
   // prLedNrDone();
   canvas.clear();
-  // canvas.fillRect(0, vert[0], dw-1, dh-1, BLACK);
   canvas.setCursor(hori[0], vert[0]+5);
   canvas.print("Zone");
   canvas.setCursor(hori[0], vert[1]);
@@ -503,7 +474,6 @@ void disp_data(void)
     return;
   // prLedNrDone();
   canvas.clear();
-  //canvas.fillRect(0, vert[0], dw-1, dh-1, BLACK);
   canvas.setCursor(hori[0], vert[0]+5);
   canvas.print(&timeinfo, "%A");  // Day of the week
   canvas.setCursor(hori[0], vert[1]-2);
@@ -549,8 +519,8 @@ void disp_data(void)
 /* the color order that these LEDs use isn't the RRGGBB found in HTML, but GGRRBB. */
 void chg_matrix_clr(void)
 {
-  // Serial.print("chg_matrix_clr(): ");
-  // Serial.print("CRGB::Orange = ");
+  // Serial.print(F("chg_matrix_clr(): "));
+  // Serial.print(F("CRGB::Orange = "));
   // Serial.println(CRGB::Orange);
   // Orange = 16753920 decimal = 1111 1111 1010 0101 0000 0000 binary = FF A5 00 hex
   switch (FSM) 
@@ -583,7 +553,6 @@ void chg_matrix_clr(void)
   FastLED.show();
 }
 
- /* In sketch "2024-09-26_M5Stack_Fire_NTP_Timeszones_DST.ino this function had name: startWiFi" */
 bool connect_WiFi(void)
 {
   char TAG[] = "connect_WiFi(): ";
@@ -668,8 +637,12 @@ void setup(void)
   // Not using I2CEnable because of fixed values for SCL and SDA in M5Atom.begin:
   M5.begin(true, false, true);  // Init Atom-Matrix(Initialize serial port, LED).
 
-  // A workaround to prevent some problems reagaring M5.Btn.IsPressed(), M5.Btn.IsPressedPressed(), M5.Btn,wasPressed() or M5.Btn.pressedFor(ms)
-  // See: https://community.m5stack.com/topic/3955/atom-button-at-gpio39-without-pullup/5
+  /*
+  * A workaround to prevent some problems regarding 
+  * M5.Btn.IsPressed(), M5.Btn.IsPressedPressed(), 
+  * M5.Btn,wasPressed() or M5.Btn.pressedFor(ms).
+  * See: https://community.m5stack.com/topic/3955/atom-button-at-gpio39-without-pullup/5
+  */
   adc_power_acquire(); // ADC Power ON
 
   attachInterrupt(digitalPinToInterrupt(ck_Btn()), handleButtonPress, FALLING);
@@ -696,7 +669,7 @@ void setup(void)
 
   getID();
 
-  Serial.println(F("\n\nM5Stack Atom Matrix Timezones test with units: RTC and OLED."));
+  Serial.println(F("\n\nM5Stack Atom Matrix Timezones test with units: OLED and RTC."));
 
   create_maps();  // creeate zones_map
 
@@ -735,7 +708,7 @@ void loop(void)
 {
   unsigned long interval_t = 5 * 60 * 1000; // 5 minutes
   unsigned long zone_chg_interval_t = 1 * 60 * 1000; // 1 minute
-  unsigned long curr_t = 9L;
+  unsigned long curr_t = 0L;
   unsigned long elapsed_t = 0L;
   bool dummy = false;
   bool zone_change = false;
@@ -792,7 +765,7 @@ void loop(void)
         FSM = 0;
       /*
         Increase the zone_index, so that the sketch
-        will display data from a next timezone in the time_zones array.
+        will display data from a next timezone in the map: time_zones.
       */
       zone_idx++;
       if (zone_idx >= zone_max_idx) 
@@ -808,7 +781,7 @@ void loop(void)
     }
     printLocalTime();
     disp_data();
-    //delay(1000);  // Wait 1 seconds
+    //delay(1000);  // Wait 1 second
     dummy = ck_Btn();  // Read the press state of the key.
   }
 }
