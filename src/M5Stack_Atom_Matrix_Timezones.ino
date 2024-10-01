@@ -24,9 +24,11 @@
 // Following 6 includes needed for creating, changing and using map time_zones
 #include <iostream>
 #include <map>
+#include <memory>
 #include <array>
 #include <string>
 #include <tuple>
+#include <iomanip>
 #include <cstring> // For strcpy
 
 namespace {  // anonymous namespace (also known as an unnamed namespace)
@@ -126,10 +128,31 @@ void map_replace_first_zone()
   // Check:
   elem_zone_check  = std::get<0>(zones_map[tmp_zone_idx]);
   elem_zone_code_check  = std::get<1>(zones_map[tmp_zone_idx]);
+
+  /*
+  std::cout << "Map size before erase: " << myMap.size() << std::endl;
+
+  for (int i = 0; i < 2; i++
+  {
+    // Get iterator to the element with key i
+    auto it = zones_map.find(i);
+    if (it != zones_map.end())
+    {
+        zones_map.erase(it);
+    }
+  std::cout << "Map size after erase: " << myMap.size() << std::endl;
+  */
+ 
+  std::cout << "map_replace_first_zone(): successful replaced the first record of the zone_map:\n" << std::endl;
   
-  Serial.print(F("map_replace_first_zone(): successful replaced the first record of the zone_map:\n"));
-  Serial.printf("zone original: \"%s\", replaced by zone: \"%s\" (from file secrets.h)\n", elem_zone_original.c_str(), elem_zone_code_check.c_str());
-  Serial.printf("zone code original: \"%s\", replaced by zone code: \"%s\"\n", elem_zone_code_original.c_str(), elem_zone_code_check.c_str());
+  std::cout << "zone original: \"" << elem_zone_original.c_str() << "\""
+    << ", replaced by zone: \"" << elem_zone_code_check.c_str()  << "\""
+    << " (from file secrets.h)\n" 
+    << std::endl;
+  
+  std::cout << "zone code original: \"" <<  elem_zone_code_original.c_str() << "\""
+    << ", replaced by zone code: \"" << elem_zone_code_check.c_str() << "\""
+    << std::endl;
 }
 
 void LedFillColor(CRGB c)
@@ -178,26 +201,24 @@ std::string elem_zone_code_old;
 bool zone_has_changed = false;
 
 void setTimezone(void){
-  char TAG[] = "setTimezone(): ";
-  Serial.print(TAG);
+  std::shared_ptr<std::string> TAG = std::make_shared<std::string>("setTimezone(): ");
+
+  std::cout << *TAG << std::flush;
   std::string elem_zone = std::get<0>(zones_map[zone_idx]);
   std::string elem_zone_code = std::get<1>(zones_map[zone_idx]);
   if (elem_zone_code != elem_zone_code_old)
   {
     const char s1[] = "has changed to: ";
     zone_has_changed = true;
-    Serial.printf("Timezone %s\"%s\"\n",s1, elem_zone.c_str());  
-    Serial.printf("Timezone code %s\"%s\"\n",s1, elem_zone_code.c_str());
+    std::cout << "Timezone " << s1 << "\"" << elem_zone.c_str() << "\"" << std::endl;
+    std::cout << "Timezone code " << s1 << "\"" << elem_zone_code.c_str() << "\"" << std::endl;
   }
   // Serial.printf("Setting Timezone to \"%s\"\n",elem_zone_code.c_str());
   setenv("TZ",elem_zone_code.c_str(),1);
   //  Now adjust the TZ.  Clock settings are adjusted to show the new local time
   tzset();
   // Check:
-  Serial.print(TAG);
-  Serial.print(F("check environment variable TZ = \""));
-  Serial.printf("%s", getenv("TZ"));
-  Serial.println(F("\""));
+  std::cout << *TAG << "check environment variable TZ = \"" << getenv("TZ") << std::endl;
 }
 
 /*
@@ -207,14 +228,13 @@ void setTimezone(void){
 */
 bool poll_NTP()
 {
-  char TAG[] = "poll_NTP(): ";
+  std::shared_ptr<std::string> TAG = std::make_shared<std::string>("poll_NTP(): ");
   bool ret = false;
   if(getLocalTime(&timeinfo))
     ret = true;
   else
   {
-    Serial.print(TAG);
-    Serial.println(F("Failed to obtain time "));
+    std::cout << *TAG << "Failed to obtain time " << std::endl;
     canvas.clear();
     canvas.setCursor(0, vert[2]);
     canvas.print(F("Failed to obtain time"));
@@ -228,18 +248,19 @@ bool poll_NTP()
 bool initTime(void)
 {
   bool ret = false;
-  char TAG[] = "initTime(): ";
+  std::shared_ptr<std::string> TAG = std::make_shared<std::string>("initTime(): ");
 
-  //str::string elem_zone = 0;
   std::string elem_zone = std::get<0>(zones_map[zone_idx]);
-   //int element_zone_code = 1;
   std::string elem_zone_code = std::get<1>(zones_map[zone_idx]);
 
-  Serial.print(TAG);
-  Serial.println(F("Setting up time"));
-  Serial.printf("zone       = \"%s\"\n", elem_zone.c_str());  
-  Serial.printf("zone_code  = \"%s\"\n", elem_zone_code.c_str());  
-  Serial.printf("NTP_SERVER1: %S, NTP_SERVER2: %s, NTP_SERVER3: %s\n", NTP_SERVER1, NTP_SERVER2, NTP_SERVER3);
+  std::cout << *TAG << "Setting up time" << std::endl;
+  std::cout << "zone       = \"" << elem_zone.c_str() << "\"" << std::endl;
+  std::cout << "zone code  = \"" << elem_zone_code.c_str() << "\"" << std::endl;
+  std::cout 
+    << "NTP_SERVER1 = \"" << NTP_SERVER1 << "\", " 
+    << "NTP_SERVER2 = \"" << NTP_SERVER2 << "\", "
+    << "NTP_SERVER3 = \"" << NTP_SERVER3 << "\""
+    << std::endl;
 
   setTimezone();  // was: zone_code[zone_idx]);  // Set the new time zone
 
@@ -254,22 +275,18 @@ bool initTime(void)
 
 // See: /Arduino/libraries/ESPDateTime/src/DateTime.cpp, lines 76-80
 #if defined(ESP8266)
-  //configTime(timeZone, ntpServer1, ntpServer2, ntpServer3);
   configTzTime(elem_zone_code.c_str(), NTP_SERVER1, NTP_SERVER2, NTP_SERVER3); 
 #elif defined(ESP32)
-  //configTzTime(timeZone, ntpServer1, ntpServer2, ntpServer3);
   configTzTime(elem_zone_code.c_str(), NTP_SERVER1, NTP_SERVER2, NTP_SERVER3);  // This one is use for the M5Stack Atom Matrix
 #endif
 
   if(!getLocalTime(&timeinfo))
   {
-    Serial.print(TAG);
-    Serial.println(F("Failed to obtain time from NTP"));
+    std::cout << *TAG << "Failed to obtain time from NTP" << std::endl;
   }
   else
   {
-    Serial.print(TAG);
-    Serial.println(F("Got the time from NTP"));
+    std::cout << *TAG << "Got the time from NTP" << std::endl;
     // Now we can set the real timezone
     ret = true;
   }
@@ -279,7 +296,6 @@ bool initTime(void)
 bool set_RTC(void)
 {
   bool ret = false;
-  constexpr char s[] = "\nset_RTC(): external RTC ";
   // Serial.print("set_RTC(): timeinfo.tm_year = ");
   // Serial.println(timeinfo.tm_year);
   if (timeinfo.tm_year + 1900 > 1900)
@@ -295,8 +311,8 @@ bool set_RTC(void)
 
     RTC.setDate(&RTCdate);
     RTC.setTime(&RTCtime);
-    Serial.println(F("set_RTC(): external RTC has been set"));
-    Serial.println(F("Check: "));
+    std::cout << "set_RTC(): external RTC has been set" << std::endl;
+    std::cout << "Check: " << std::endl;
     poll_date_RTC();
     poll_time_RTC();
     ret = true;
@@ -307,13 +323,20 @@ bool set_RTC(void)
 void poll_date_RTC(void)
 {
   RTC.getDate(&RTCdate);
-  Serial.printf("RTC date: %4d-%02d-%02d\n", RTCdate.Year, RTCdate.Month, RTCdate.Date);
+  std::cout << "RTC date: " 
+    << std::setw(4) << String(RTCdate.Year).c_str() << "-" 
+    << std::setfill('0') << std::setw(2) << String(RTCdate.Month).c_str() << "-" 
+    << std::setfill('0') << std::setw(2) << String(RTCdate.Date).c_str() 
+    << std::endl;
 }
 
 void poll_time_RTC(void)
 {
   RTC.getTime(&RTCtime);
-  Serial.printf("RTC time: %02d:%02d:%02d\n", RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
+  std::cout << "RTC time: "
+      << std::setfill('0') << std::setw(2) << String(RTCtime.Hours).c_str()   << ":" 
+      << std::setfill('0') << std::setw(2) << String(RTCtime.Minutes).c_str() << ":" 
+      << std::setfill('0') << std::setw(2) << String(RTCtime.Seconds).c_str() << std::endl;
 }
 
 void printLocalTime()  // "Local" of the current selected timezone!
@@ -326,8 +349,8 @@ void printLocalTime()  // "Local" of the current selected timezone!
   {
     char buffer[64];
     strftime(buffer, sizeof(buffer), "%A, %B %d %Y %H:%M:%S zone %Z %z", &timeinfo);
-    Serial.printf("Timezone: %s, ", elem_zone.c_str());
-    Serial.println(buffer);
+    std::cout << "Timezone: " << elem_zone.c_str() << ", " << buffer << std::endl;
+
   }
 }
 
@@ -343,7 +366,7 @@ void prLedNrDone()
 */
 void disp_data(void)
 {
-  char TAG[] = "disp_data(): ";
+  std::shared_ptr<std::string> TAG = std::make_shared<std::string>("disp_data(): ");
   int disp_data_delay = 1000;
   // For unitOLED
   int scrollstep = 2;
@@ -468,8 +491,7 @@ void disp_data(void)
   if (index2 >= 0)
   {
     canvas.printf("in: %s\n", part4.c_str());
-    Serial.print(TAG);
-    Serial.printf("part4 = %s, index2 = %d\n", part4.c_str(), index2);
+    std::cout << *TAG << "part4 = " << part4.c_str() << ", index2 = " << index2 << std::endl;
   }
   else
     canvas.printf("in: %s\n", part2.c_str());
@@ -487,10 +509,6 @@ void disp_data(void)
 /* the color order that these LEDs use isn't the RRGGBB found in HTML, but GGRRBB. */
 void chg_matrix_clr(void)
 {
-  // Serial.print(F("chg_matrix_clr(): "));
-  // Serial.print(F("CRGB::Orange = "));
-  // Serial.println(CRGB::Orange);
-  // Orange = 16753920 decimal = 1111 1111 1010 0101 0000 0000 binary = FF A5 00 hex
   switch (FSM) 
   {
     case 0:
@@ -523,43 +541,57 @@ void chg_matrix_clr(void)
 
 bool connect_WiFi(void)
 {
-  char TAG[] = "connect_WiFi(): ";
+  std::shared_ptr<std::string> TAG = std::make_shared<std::string>("connect_WiFi(): ");
   bool ret = false;
-  Serial.print(F("\nWiFi:"));
+  std::cout << std::endl << "WiFi: " << std::flush;
   WiFi.begin( WIFI_SSID, WIFI_PASSWORD );
 
   for (int i = 20; i && WiFi.status() != WL_CONNECTED; --i)
   {
-    Serial.print(".");
+    std::cout << "." << std::flush;
     delay(500);
   }
   if (WiFi.status() == WL_CONNECTED) 
   {
     ret = true;
     Serial.print(F("\r\n"));
-    Serial.print(TAG);
-    Serial.print(F("WiFi Connected to: "));
-    Serial.println(WIFI_SSID);
+    std::cout << "\r\n" << std::flush;
+    std::cout << *TAG << "WiFi Connected to: " << WIFI_SSID << std::endl;
     IPAddress ip;
     ip = WiFi.localIP();
-    Serial.print(F("IP address: "));
-    Serial.println(ip);
+    std::cout << "IP address: " << std::hex << ip << std::endl;
     byte mac[6];
     WiFi.macAddress(mac);
-    Serial.print(F("MAC: "));
-    for (int i = 5; i >= 0; i--) {
-      Serial.print(mac[i], HEX);
-      if (i > 0) Serial.print(":");
+
+    // Allocate a buffer of 18 characters (12 for MAC + 5 colons + 1 null terminator)
+    char* mac_buff = new char[18];
+
+    // Create a shared_ptr to manage the buffer with a custom deleter
+    std::shared_ptr<char> bufferPtr(mac_buff, customDeleter);
+
+    std::cout << *TAG << std::endl;
+
+    // Format the MAC address into the buffer
+    char* ptr = bufferPtr.get();
+    for (int i = 0; i < 6; ++i) {
+        if (i > 0) {
+            *ptr++ = ':'; // Add colon between MAC address bytes
+        }
+        sprintf(ptr, "%02X", mac[i]);
+        ptr += 2;
     }
-    Serial.println();
+    std::cout << "MAC: " << bufferPtr.get() << std::endl;
   }
   else
   {
-    Serial.print(F("\r\n"));
-    Serial.print(TAG);
-    Serial.println(F("WiFi connection failed."));
+    std::cout << "\r\n" << *TAG << "WiFi connection failed." << std::endl;
   }
   return ret;
+}
+
+void customDeleter(char* buffer) {
+    // std::cout << "\nCustom deleter called\n" << std::endl;
+    delete[] buffer;
 }
 
 void getID(void)
@@ -567,16 +599,16 @@ void getID(void)
   uint64_t chipid_EfM = ESP.getEfuseMac(); // The chip ID is essentially the MAC address 
   char chipid[13] = {0};
   sprintf( chipid,"%04X%08X", (uint16_t)(chipid_EfM>>32), (uint32_t)chipid_EfM );
-  Serial.printf("\nESP32 Chip ID = %s\n", chipid);
-
-  Serial.print(F("chipid mirrored (same as M5Burner MAC): "));
+  std::cout << "\nESP32 Chip ID = " << chipid << std::endl;
+  std::cout << "chipid mirrored (same as M5Burner MAC): " << std::flush;
   // Mirror MAC address:
   for (uint8_t i = 10; i >= 0; i-=2)  // 10, 8. 6. 4. 2, 0
   {
-    Serial.print(chipid[i]);   // bytes 10, 8, 6, 4, 2, 0
-    Serial.print(chipid[i+1]); // bytes 11, 9, 7. 5, 3, 1
+    // bytes 10, 8, 6, 4, 2, 0
+    // bytes 11, 9, 7. 5, 3, 1
+    std::cout << chipid[i] << chipid[i+1] << std::flush;
     if (i > 0)
-      Serial.print(":");
+      std::cout << ":" << std::flush;
     if (i == 0)  // Note: this needs to be here. Yes, it is strange but without it the loop keeps on running.
       break;     // idem.
   }
@@ -639,7 +671,7 @@ void setup(void)
 
   getID();
 
-  Serial.println(F("\n\nM5Stack Atom Matrix Timezones test with units: OLED and RTC."));
+  std::cout << "\n\nM5Stack Atom Matrix Timezones test with units: OLED and RTC." << std::endl;
 
   create_maps();  // creeate zones_map
 
@@ -689,6 +721,8 @@ void loop(void)
     {
       if (WiFi.status() != WL_CONNECTED) // Check if we're still connected to WiFi
       {
+        // Serial.print(F("loop(): WiFi connection lost. Trying to reconnect..."));
+        std::cout << "loop(): WiFi connection lost. Trying to reconnect..." << std::endl;
         if (!connect_WiFi())  // Try to connect WiFi
         {
           connect_try++;
@@ -696,9 +730,7 @@ void loop(void)
 
         if (connect_try >= max_connect_try)
         {
-          Serial.print(F("\nWiFi connect try failed "));
-          Serial.print(connect_try);
-          Serial.println(F("time. Going into infinite loop...\n"));
+          std::cout << "\nWiFi connect try failed " << connect_try << "times. Going into infinite loop...\n" << std::flush;
           for(;;)
           {
             delay(5000);
@@ -726,7 +758,7 @@ void loop(void)
     if (LedTimeToChangeColor || buttonPressed || elapsed_t >= zone_chg_interval_t)
     {
       if (buttonPressed)
-        Serial.println(F("\nButton pressed\n"));
+        std::cout << "\nButton pressed\n" << std::endl;
       /*
         Increases the FSM Atom Matrix Display color index.
       */
