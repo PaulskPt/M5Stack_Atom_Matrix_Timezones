@@ -69,3 +69,7 @@ Links to product pages of the hardware used:
 - M5Stack OLED unit [info](https://docs.m5stack.com/en/unit/oled);
 - M5Stack RTC unit [info](https://shop.m5stack.com/products/real-time-clock-rtc-unit-hym8563)
 
+Known problem:
+The sketch halts after running for about 10 or more hours. I suspect that this is caused by a memory leak. I am investigating it.
+
+
