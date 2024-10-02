@@ -60,7 +60,6 @@ Images:
 
 See a snapshot image taken from a video I creeated of the sketch running. I uploaded this video to Irmgur,
 however, until this moment, I wasn't able to create a correct link to put in this README.
-[video](https://imgur.com/LpO2fyk).
 
 Links to product pages of the hardware used:
 
