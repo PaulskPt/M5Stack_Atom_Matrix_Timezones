@@ -234,7 +234,7 @@ bool poll_NTP()
     ret = true;
   else
   {
-    std::cout << *TAG << "Failed to obtain time " << std::endl;
+    std::cout << *TAG << "Failed to obtain datetime " << std::endl;
     canvas.clear();
     canvas.setCursor(0, vert[2]);
     canvas.print(F("Failed to obtain time"));
@@ -282,11 +282,11 @@ bool initTime(void)
 
   if(!getLocalTime(&timeinfo))
   {
-    std::cout << *TAG << "Failed to obtain time from NTP" << std::endl;
+    std::cout << *TAG << "Failed to obtain datetime" << std::endl;
   }
   else
   {
-    std::cout << *TAG << "Got the time from NTP" << std::endl;
+    std::cout << *TAG << "Got the datetime" << std::endl;
     // Now we can set the real timezone
     ret = true;
   }
