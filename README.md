@@ -70,6 +70,6 @@ Links to product pages of the hardware used:
 - M5Stack RTC unit [info](https://shop.m5stack.com/products/real-time-clock-rtc-unit-hym8563)
 
 Known problem:
-The sketch halted after running for 4h15. I suspect that this is caused by a memory leak. I am investigating it.
+The sketch halts after running for a few hours. I suspect that this is caused by a memory leak. I am investigating it.
 
 
